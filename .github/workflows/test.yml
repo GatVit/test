@@ -1,0 +1,35 @@
+name: Test
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC = 09:00 МСК
+  workflow_dispatch:        # ручной запуск для проверки
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # право на push
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Configure Git
+        run: |
+          git config --local user.name "GatVit"
+          git config --local user.email "277098481+GatVit@users.noreply.github.com"
+
+      - name: Update file.txt
+        run: |
+          RANDOM_STR=$(openssl rand -hex 4)
+          echo "test $RANDOM_STR" >> file.txt
+          echo "RANDOM_STR=$RANDOM_STR" >> "$GITHUB_ENV"
+
+      - name: Commit and push
+        run: |
+          git add file.txt
+          git commit -m "test ${{ env.RANDOM_STR }}"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref_name }}
