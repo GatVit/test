@@ -39,7 +39,7 @@ jobs:
               with open('datetest.json', 'r') as f:
                   config = json.load(f)
                   if today in config:
-                      target_commits = 12
+                      target_commits = 16
           except Exception:
               pass
               
